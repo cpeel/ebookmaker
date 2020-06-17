@@ -18,12 +18,21 @@ import os.path
 import gzip
 import zipfile
 
-from pkg_resources import resource_listdir  # pylint: disable=E0611
+from importlib import import_module
 
 from libgutenberg.Logger import debug, info, warning, error
 import libgutenberg.GutenbergGlobals as gg
 
 GZIP_EXTENSION = '.gzip'
+
+packagerlist = [
+    "GzipPackager",
+    "HTMLPackager",
+    "PDFPackager",
+    "PushPackager",
+    "RSTPackager",
+    "TxtPackager",
+]
 
 class BasePackager (object):
     """
@@ -157,16 +166,12 @@ class PackagerFactory (object):
     def load_packagers (cls):
         """ Load the packagers in the packagers directory. """
 
-        for fn in resource_listdir ('ebookmaker.packagers', ''):
-            modulename, ext = os.path.splitext (fn)
-            if ext == '.py':
-                if modulename.endswith ('Packager'):
-                    module = __import__ ('ebookmaker.packagers.' + modulename,
-                                         fromlist = [modulename])
-                    debug ("Loading packager type: %s from module: %s for formats: %s" % (
-                        module.TYPE, modulename, ', '.join (module.FORMATS)))
-                    for format_ in module.FORMATS:
-                        cls.packagers[cls.mk_key (module.TYPE, format_)] = module
+        for modulename in packagerlist:
+            module = import_module("ebookmaker.packagers." + modulename)
+            debug ("Loading packager type: %s from module: %s for formats: %s" % (
+                module.TYPE, modulename, ', '.join (module.FORMATS)))
+            for format_ in module.FORMATS:
+                cls.packagers[cls.mk_key (module.TYPE, format_)] = module
 
         return cls.packagers.keys ()
 

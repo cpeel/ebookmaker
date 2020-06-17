@@ -28,6 +28,15 @@ from ebookmaker import parsers
 from ebookmaker import ParserFactory
 from ebookmaker.Version import VERSION, GENERATOR
 
+writerlist = [
+    "EpubWriter",
+    "HTMLWriter",
+    "KindleWriter",
+    "PDFWriter",
+    "PicsDirWriter",
+    "RSTWriter",
+    "TxtWriter",
+]
 
 class BaseWriter (object):
     """

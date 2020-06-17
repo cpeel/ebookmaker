@@ -31,6 +31,17 @@ from libgutenberg.Logger import info, debug, error
 
 from ebookmaker.CommonCode import Options
 
+# explicitly define the set of available parsers in this directory
+parserlist = [
+    "AuxParser",
+    "CSSParser",
+    "GutenbergTextParser",
+    "HTMLParser",
+    "ImageParser",
+    "RSTParser",
+    "WrapperParser",
+]
+
 options = Options()
 
 BROKEN = 'resource://ebookmaker.parsers/broken.png'

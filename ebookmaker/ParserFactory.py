@@ -12,13 +12,14 @@ Distributable under the GNU General Public License Version 3 or newer.
 """
 
 
+from importlib import import_module
 import os.path
 import re
 
 from six.moves import urllib
 import six
 
-from pkg_resources import resource_listdir, resource_stream # pylint: disable=E0611
+from pkg_resources import resource_stream # pylint: disable=E0611
 import requests
 
 from libgutenberg.Logger import debug, error
@@ -26,6 +27,7 @@ from libgutenberg import MediaTypes
 from ebookmaker.CommonCode import Options
 from ebookmaker.Version import VERSION
 from ebookmaker import parsers
+from ebookmaker.parsers import parserlist
 
 options = Options()
 parser_modules = {}
@@ -33,15 +35,12 @@ parser_modules = {}
 def load_parsers():
     """ See what types we can parse. """
 
-    for fn in resource_listdir('ebookmaker.parsers', ''):
-        modulename, ext = os.path.splitext(fn)
-        if ext == '.py':
-            if modulename.endswith('Parser'):
-                module = __import__('ebookmaker.parsers.' + modulename, fromlist=[modulename])
-                debug("Loading parser from module: %s for mediatypes: %s" % (
-                    modulename, ', '.join(module.mediatypes)))
-                for mediatype in module.mediatypes:
-                    parser_modules[mediatype] = module
+    for modulename in parserlist:
+        module = import_module("ebookmaker.parsers." + modulename)
+        debug("Loading parser from module: %s for mediatypes: %s" % (
+            modulename, ', '.join(module.mediatypes)))
+        for mediatype in module.mediatypes:
+            parser_modules[mediatype] = module
 
     return parser_modules.keys()
 
